@@ -117,7 +117,7 @@
 (defun substituir-posicao (n linha x)
   "Substitui o indice n da linha por x"
   (cond ((or (not (posicao-validap n)) (null (nth (1- n) linha))) nil)
-             ((and (/= x 0) (/= x 1)) nil)
+             ((and (/= x -1) (/= x 0) (/= x 1)) nil)
              ((= n 1) (cons x (rest linha)))
              (t (cons (first linha) (substituir-posicao (1- n) (rest linha) x)))
   )
