@@ -92,14 +92,26 @@
   (fourth no)
 )
 
+;; No-heuristica
 (defun no-heuristica (no)
   "Ver a heuristica do nó"
   (third no)
 )
 
+;; No-valor
 (defun no-valor (no)
   "Calcula o valor do nó"
   (+ (no-profundidade no) (no-heuristica no))
+)
+
+(defun no-solcaop (no)
+  "Verifica se o nó é um nó solução"
+  (cond ((or (contains (first (no-estado no)) *jogador2*))
+        (contains (second (no-estado no)) *jogador2*)
+        (contains (sixth (no-estado no)) *jogador1*)
+        (contains (seventh (no-estado no)) *jogador1*) t)
+        (t nil)
+  )
 )
 
 
@@ -140,6 +152,10 @@
   )
 )
 
+(defun contains (linha jogador)
+  (some (lambda (x) (= x jogador)) linha)
+)
+
 
 ;; Operadores
 
@@ -154,7 +170,10 @@
   "Realizar uma captura de pino à direita"
   (cond ((null tabuleiro) nil)
              ((or (not (celula-validap x y tabuleiro))
-                  (not (celula-validap x (+ y 2) tabuleiro))) nil)
+                  (not (celula-validap x (+ y 2) tabule
+
+
+(format t"~a~%" (operador-cc *jogador2* 5 3 (tabuleiro-teste)))iro))) nil)
              ((not (equal (celula x (+ y 2) tabuleiro) 0)) nil)
              ((or (not (equal (celula x y tabuleiro) jogador))
                   (equal (celula x (1+ y) tabuleiro) jogador)) nil)
@@ -203,7 +222,7 @@
 
 ;; Andar Direita
 (defun operador-d (jogador x y tabuleiro)
-  "Realiza m movimento para a direita com o pino"
+  "Realiza movimento para a direita com o pino"
   (cond ((null tabuleiro) nil)
         ((or (not (celula-validap x y tabuleiro))
              (not (celula-validap x (1+ y) tabuleiro))) nil)
@@ -215,7 +234,7 @@
 
 ;; Andar Esquerda
 (defun operador-e (jogador x y tabuleiro)
-  "Realiza m movimento para a direita com o pino"
+  "Realiza movimento para a direita com o pino"
   (cond ((null tabuleiro) nil)
         ((or (not (celula-validap x y tabuleiro))
              (not (celula-validap x (1- y) tabuleiro))) nil)
@@ -227,7 +246,7 @@
 
 ;; Andar Cima
 (defun operador-c (jogador x y tabuleiro)
-  "Realiza m movimento para a direita com o pino"
+  "Realiza movimento para a direita com o pino"
   (cond ((null tabuleiro) nil)
         ((or (not (celula-validap x y tabuleiro))
              (not (celula-validap (1- x) y tabuleiro))) nil)
@@ -239,7 +258,7 @@
 
 ;; Andar Baixo
 (defun operador-b (jogador x y tabuleiro)
-  "Realiza m movimento para a direita com o pino"
+  "Realiza movimento para a direita com o pino"
   (cond ((null tabuleiro) nil)
         ((or (not (celula-validap x y tabuleiro))
              (not (celula-validap (1+ x) y tabuleiro))) nil)
