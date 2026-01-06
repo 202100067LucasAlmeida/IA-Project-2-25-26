@@ -21,13 +21,13 @@
 
 (defun tabuleiro-teste (&aux (J1 *jogador1*) (J2 *jogador2*))
   "Tabuleiro de teste sem nenhuma jogada realizada"
-  '((nil nil  J2  J2  J2 nil nil)
-    (nil nil  J2  J2  J2 nil nil)
+  `((nil nil ,J1 ,J1 ,J1 nil nil)
+    (nil nil ,J1 ,J1 ,J1 nil nil)
     ( 0   0   0   0   0   0   0 )
     ( 0   0   0   0   0   0   0 )
     ( 0   0   0   0   0   0   0 )
-    (nil nil  J1  J1  J1 nil nil)
-    (nil nil  J1  J1  J1 nil nil))
+    (nil nil ,J2 ,J2 ,J2 nil nil)
+    (nil nil ,J2 ,J2 ,J2 nil nil))
 )
 
 (defun no-teste ()
@@ -213,7 +213,9 @@
 (defun operador-d (jogador x y tabuleiro)
   "Realiza m movimento para a direita com o pino"
   (cond ((null tabuleiro) nil)
-        ((not (equal (- (celula x y tabuleiro)) jogador)) nil)
+        ((or (not (celula-validap x y tabuleiro))
+             (not (celula-validap x (1+ y) tabuleiro))) nil)
+        ((not (equal (celula x y tabuleiro) jogador)) nil)
         ((not (equal (celula x (1+ y) tabuleiro) 0)) nil)
         (t (substituir x y (substituir x (1+ y) tabuleiro jogador) 0))
   )
@@ -223,7 +225,9 @@
 (defun operador-e (jogador x y tabuleiro)
   "Realiza m movimento para a direita com o pino"
   (cond ((null tabuleiro) nil)
-        ((not (equal (- (celula x y tabuleiro)) jogador)) nil)
+        ((or (not (celula-validap x y tabuleiro))
+             (not (celula-validap x (1- y) tabuleiro))) nil)
+        ((not (equal (celula x y tabuleiro) jogador)) nil)
         ((not (equal (celula x (1- y) tabuleiro) 0)) nil)
         (t (substituir x y (substituir x (1- y) tabuleiro jogador) 0))
   )
@@ -233,9 +237,11 @@
 (defun operador-c (jogador x y tabuleiro)
   "Realiza m movimento para a direita com o pino"
   (cond ((null tabuleiro) nil)
-        ((not (equal (- (celula x y tabuleiro)) jogador)) nil)
-        ((not (equal (celula (1+ x) y tabuleiro) 0)) nil)
-        (t (substituir x y (substituir (1+ x) y tabuleiro jogador) 0))
+        ((or (not (celula-validap x y tabuleiro))
+             (not (celula-validap (1- x) y tabuleiro))) nil)
+        ((not (equal (celula x y tabuleiro) jogador)) nil)
+        ((not (equal (celula (1- x) y tabuleiro) 0)) nil)
+        (t (substituir x y (substituir (1- x) y tabuleiro jogador) 0))
   )
 )
 
@@ -243,8 +249,10 @@
 (defun operador-b (jogador x y tabuleiro)
   "Realiza m movimento para a direita com o pino"
   (cond ((null tabuleiro) nil)
-        ((not (equal (- (celula x y tabuleiro)) jogador)) nil)
-        ((not (equal (celula (1- x) y tabuleiro) 0)) nil)
-        (t (substituir x y (substituir (1- x) y tabuleiro jogador) 0))
+        ((or (not (celula-validap x y tabuleiro))
+             (not (celula-validap (1+ x) y tabuleiro))) nil)
+        ((not (equal (celula x y tabuleiro) jogador)) nil)
+        ((not (equal (celula (1+ x) y tabuleiro) 0)) nil)
+        (t (substituir x y (substituir (1+ x) y tabuleiro jogador) 0))
   )
 )
