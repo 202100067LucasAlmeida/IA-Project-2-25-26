@@ -32,7 +32,7 @@
 
 (defun no-teste ()
   "Cria um nó para testes"
-  (list (tabuleiro-teste) 0 0 nil)
+  (list (tabuleiro-teste) 0 (heuristica-2 (tabuleiro-teste)) nil)
 )
 
 
