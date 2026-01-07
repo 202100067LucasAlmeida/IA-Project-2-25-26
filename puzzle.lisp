@@ -1,7 +1,7 @@
 #|
-# Projeto 2 - InteligÍncia Artificial
+# Projeto 2 - Intelig√™ncia Artificial
 #
-# Ficheiro destinado a implementar funÁıes de auxiliaÁ„o, definiÁ„o dos operadores e heurÌsticas.
+# Ficheiro destinado a implementar fun√ß√µes de auxilia√ß√£o, defini√ß√£o dos operadores e heur√≠sticas.
 #
 # Docente > Joaquim Filipe
 #
@@ -10,7 +10,7 @@
 # > Jean Oliveira, 202300095
 # > Lucas Almeida, 202100067
 #
-# > Nota: FunÁıes assinaladas com (*) s„o funÁıes definidas alÈm do enunciado.
+# > Nota: Fun√ß√µes assinaladas com (*) s√£o fun√ß√µes definidas al√©m do enunciado.
 |#
 
 (defvar *jogador2* -1)
@@ -22,16 +22,16 @@
 (defun tabuleiro-teste (&aux (J1 *jogador1*) (J2 *jogador2*))
   "Tabuleiro de teste sem nenhuma jogada realizada"
   `((nil nil ,J1 ,J1 ,J1 nil nil)
-    (nil nil  0  ,J1 ,J1 nil nil)
+    (nil nil ,J1 ,J1 ,J1 nil nil)
     ( 0   0   0   0   0   0   0 )
-    ( 0   0  ,J1  0   0   0   0 )
-    ( 0   0  ,J2  0   0   0   0 )
-    (nil nil  0  ,J2 ,J2 nil nil)
+    ( 0   0   0   0   0   0   0 )
+    ( 0   0   0   0   0   0   0 )
+    (nil nil ,J2 ,J2 ,J2 nil nil)
     (nil nil ,J2 ,J2 ,J2 nil nil))
 )
 
 (defun no-teste ()
-  "Cria um nÛ para testes"
+  "Cria um n√≥ para testes"
   (list (tabuleiro-teste) 0 0 nil)
 )
 
@@ -54,25 +54,25 @@
    )
 )
 
-;; CÈlula
+;; C√©lula
 (defun celula (x y tabuleiro)
-  "Retorna a cÈlula (x, y) do tabuleiro"
+  "Retorna a c√©lula (x, y) do tabuleiro"
   (cond ((and (posicao-validap x) (posicao-validap y)) (nth (1- y) (nth (1- x) tabuleiro)))
              (t nil)
    )
 )
 
 
-;;; NÛs
+;;; N√≥s
 
 ;; Construtor
 (defun cria-no (tabuleiro heuristica &optional (p 0) (pai nil))
-  "Criar um nÛ com o estado do tabuleiro sua profundidade e seu nÛ pai"
+  "Criar um n√≥ com o estado do tabuleiro sua profundidade e seu n√≥ pai"
   (list tabuleiro p (funcall heuristica tabuleiro) pai)
 )
 
 
-;;; Seletores NÛ
+;;; Seletores N√≥
 
 ;; No-estado
 (defun no-estado (no)
@@ -82,30 +82,30 @@
 
 ;; No-profundidade
 (defun no-profundidade (no)
-  "Ver a profundidade do nÛ"
+  "Ver a profundidade do n√≥"
   (second no)
 )
 
 ;; No-pai
 (defun no-pai (no)
-  "Ver o nÛ pai do nÛ"
+  "Ver o n√≥ pai do n√≥"
   (fourth no)
 )
 
 ;; No-heuristica
 (defun no-heuristica (no)
-  "Ver a heuristica do nÛ"
+  "Ver a heuristica do n√≥"
   (third no)
 )
 
 ;; No-valor
 (defun no-valor (no)
-  "Calcula o valor do nÛ"
+  "Calcula o valor do n√≥"
   (+ (no-profundidade no) (no-heuristica no))
 )
 
 (defun no-solcaop (no)
-  "Verifica se o nÛ È um nÛ soluÁ„o"
+  "Verifica se o n√≥ √© um n√≥ solu√ß√£o"
   (cond ((or (contains (first (no-estado no)) *jogador2*))
         (contains (second (no-estado no)) *jogador2*)
         (contains (sixth (no-estado no)) *jogador1*)
@@ -115,11 +115,11 @@
 )
 
 
-;; FunÁıes Auxiliares
+;; Fun√ß√µes Auxiliares
 
 ;; Celula-validap
 (defun celula-validap (x y tabuleiro)
-  "Determina se a cÈlula (x, y) do tabuleiro È v·lida (!= nil)"
+  "Determina se a c√©lula (x, y) do tabuleiro √© v√°lida (!= nil)"
   (cond ((null (celula x y tabuleiro)) nil)
              (t t)
   )
@@ -144,9 +144,9 @@
   )
 )
 
-;; PosiÁ„o V·lida (*)
+;; Posi√ß√£o V√°lida (*)
 (defun posicao-validap(x)
-  "Validar se a posiÁ„o x È v·lida no tabuleiro 7x7"
+  "Validar se a posi√ß√£o x √© v√°lida no tabuleiro 7x7"
   (cond ((or (< x 1) (> x 7)) nil)
              (t t)
   )
@@ -167,13 +167,10 @@
 
 ;; Captura Direita
 (defun operador-cd (jogador x y tabuleiro)
-  "Realizar uma captura de pino ‡ direita"
+  "Realizar uma captura de pino √† direita"
   (cond ((null tabuleiro) nil)
              ((or (not (celula-validap x y tabuleiro))
-                  (not (celula-validap x (+ y 2) tabule
-
-
-(format t"~a~%" (operador-cc *jogador2* 5 3 (tabuleiro-teste)))iro))) nil)
+                  (not (celula-validap x (+ y 2) tabuleiro))) nil)
              ((not (equal (celula x (+ y 2) tabuleiro) 0)) nil)
              ((or (not (equal (celula x y tabuleiro) jogador))
                   (equal (celula x (1+ y) tabuleiro) jogador)) nil)
@@ -183,7 +180,7 @@
 
 ;; Captura Esquerda
 (defun operador-ce (jogador x y tabuleiro)
-  "Realizar uma captura de pino ‡ esquerda"
+  "Realizar uma captura de pino √† esquerda"
   (cond ((null tabuleiro) nil)
              ((or (not (celula-validap x y tabuleiro))
                   (not (celula-validap x (- y 2) tabuleiro))) nil)
@@ -196,7 +193,7 @@
 
 ;; Captura Cima
 (defun operador-cc (jogador x y tabuleiro)
-  "Realizar uma captura de pino ‡ cima"
+  "Realizar uma captura de pino √† cima"
   (cond ((null tabuleiro) nil)
              ((or (not (celula-validap x y tabuleiro))
                   (not (celula-validap (- x 2) y tabuleiro))) nil)
@@ -209,7 +206,7 @@
 
 ;; Captura Baixo
 (defun operador-cb (jogador x y tabuleiro)
-  "Realizar uma captura de pino ‡ baixo"
+  "Realizar uma captura de pino √† baixo"
   (cond ((null tabuleiro) nil)
              ((or (not (celula-validap x y tabuleiro))
                   (not (celula-validap (+ x 2) y tabuleiro))) nil)
@@ -267,3 +264,5 @@
         (t (substituir x y (substituir (1+ x) y tabuleiro jogador) 0))
   )
 )
+
+(format t"~a~%" (operador-b *jogador1* 2 3 (tabuleiro-teste)))
