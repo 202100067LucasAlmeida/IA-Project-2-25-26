@@ -28,3 +28,15 @@
         (t (ordenar-nos-recursivo no (cdr nos)))
   )
 )
+
+(defun negamax (no alfa beta altura corte jogador tempo &optional(melhor-jogada nil) (start-time0))
+  (cond (())
+        ((= tempo (get-internal-real-time)) melhor-jogada)
+        ((or (= 0 altura) (= (no-profundidade no) altura)) (* (no-heuristica no) corte))
+        ()
+  )
+)
+
+(defun sucessores (no jogador)
+  ()
+)

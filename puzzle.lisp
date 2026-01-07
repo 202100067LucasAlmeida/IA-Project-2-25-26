@@ -15,6 +15,8 @@
 
 (defvar *jogador2* -1)
 (defvar *jogador1* 1)
+(defconstant +infinity+ :infinity)
+(defconstant -infinity+ :-infinity)
 
 
 ;;; Tabuleiros
@@ -32,7 +34,7 @@
 
 (defun no-teste ()
   "Cria um nó para testes"
-  (list (tabuleiro-teste) 0 0 nil)
+  (list (tabuleiro-teste)  0 0 nil)
 )
 
 
@@ -145,7 +147,7 @@
 )
 
 ;; Posição Válida (*)
-(defun posicao-validap(x)
+(defun posicao-validap (x)
   "Validar se a posição x é válida no tabuleiro 7x7"
   (cond ((or (< x 1) (> x 7)) nil)
              (t t)
@@ -162,7 +164,7 @@
 ;; Todos os Operadores
 (defun operadores ()
   "Cria uma lista com todos os operadores do jogo"
-  (list 'operador-cd 'operador-ce 'operador-cc 'operador-cb)
+  (list 'operador-cd 'operador-ce 'operador-cc 'operador-cb 'operador-d 'operador-e 'operador-c 'operador-b)
 )
 
 ;; Captura Direita
@@ -264,5 +266,3 @@
         (t (substituir x y (substituir (1+ x) y tabuleiro jogador) 0))
   )
 )
-
-(format t"~a~%" (operador-b *jogador1* 2 3 (tabuleiro-teste)))
