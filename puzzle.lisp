@@ -34,7 +34,7 @@
 
 (defun no-teste ()
   "Cria um nó para testes"
-  (list (tabuleiro-teste)  0 0 nil)
+  (list (tabuleiro-teste) 0 0 0 nil)
 )
 
 
@@ -68,9 +68,9 @@
 ;;; Nós
 
 ;; Construtor
-(defun cria-no (tabuleiro heuristica &optional (p 0) (pai nil))
+(defun cria-no (tabuleiro heuristica jogador &optional (p 0) (pai nil))
   "Criar um nó com o estado do tabuleiro sua profundidade e seu nó pai"
-  (list tabuleiro p (funcall heuristica tabuleiro) pai)
+  (list tabuleiro p (funcall heuristica tabuleiro jogador) pai)
 )
 
 
@@ -106,7 +106,7 @@
   (+ (no-profundidade no) (no-heuristica no))
 )
 
-(defun no-solcaop (no)
+(defun no-solucaop (no)
   "Verifica se o nó é um nó solução"
   (cond ((or (contains (first (no-estado no)) *jogador2*))
         (contains (second (no-estado no)) *jogador2*)
@@ -155,7 +155,36 @@
 )
 
 (defun contains (linha jogador)
-  (some (lambda (x) (= x jogador)) linha)
+  "Verifica se existe um dado jogador em uma linha"
+  (some (lambda (x) 
+    (cond ((null x) nil)
+          ((= x jogador) t)
+          (t nil))) linha)
+)
+
+(defun distancia-vitoria (tabuleiro jogador &optional (x 1) (y 1))
+  "Calcula o peão que está mais perto de vencer de um dado jogador"
+  (cond ((> x 7) 0)
+        ((> y 7) (distancia-vitoria tabuleiro jogador (1+ x)))
+        (t (let* ((cel (celula x y tabuleiro)))
+          (cond ((or (null cel) (/= cel jogador))
+                (distancia-vitoria tabuleiro jogador x (1+ y)))
+                ((= jogador *jogador1*)
+                (cond 
+                  ((> y 4) (+ (abs (- x 6)) (abs (- y 5))))
+                  ((= y 4) (+ (abs (- x 6)) (abs (- y 4))))
+                  ((< y 4) (+ (abs (- x 6)) (abs (- y 3)))))
+                )
+                ((= jogador *jogador2*)
+                (cond 
+                  ((> y 4) (+ (abs (- x 2)) (abs (- y 5))))
+                  ((= y 4) (+ (abs (- x 2)) (abs (- y 4))))
+                  ((< y 4) (+ (abs (- x 2)) (abs (- y 3)))))
+                )
+                (t 0)
+          )
+        )
+  )
 )
 
 
