@@ -15,8 +15,7 @@
 
 (defvar *jogador2* -1)
 (defvar *jogador1* 1)
-(defconstant +infinity+ :infinity)
-(defconstant -infinity+ :-infinity)
+(defparameter *infinity* 9999999999999999)
 
 
 ;;; Tabuleiros
@@ -167,22 +166,23 @@
   (cond ((> x 7) 0)
         ((> y 7) (distancia-vitoria tabuleiro jogador (1+ x)))
         (t (let* ((cel (celula x y tabuleiro)))
-          (cond ((or (null cel) (/= cel jogador))
-                (distancia-vitoria tabuleiro jogador x (1+ y)))
-                ((= jogador *jogador1*)
-                (cond 
-                  ((> y 4) (+ (abs (- x 6)) (abs (- y 5))))
-                  ((= y 4) (+ (abs (- x 6)) (abs (- y 4))))
-                  ((< y 4) (+ (abs (- x 6)) (abs (- y 3)))))
-                )
-                ((= jogador *jogador2*)
-                (cond 
-                  ((> y 4) (+ (abs (- x 2)) (abs (- y 5))))
-                  ((= y 4) (+ (abs (- x 2)) (abs (- y 4))))
-                  ((< y 4) (+ (abs (- x 2)) (abs (- y 3)))))
-                )
-                (t 0)
-          )
+              (cond ((or (null cel) (/= cel jogador))
+                    (distancia-vitoria tabuleiro jogador x (1+ y)))
+                    ((= jogador *jogador1*)
+                    (cond 
+                      ((> y 4) (+ (abs (- x 6)) (abs (- y 5))))
+                      ((= y 4) (+ (abs (- x 6)) (abs (- y 4))))
+                      ((< y 4) (+ (abs (- x 6)) (abs (- y 3)))))
+                    )
+                    ((= jogador *jogador2*)
+                    (cond 
+                      ((> y 4) (+ (abs (- x 2)) (abs (- y 5))))
+                      ((= y 4) (+ (abs (- x 2)) (abs (- y 4))))
+                      ((< y 4) (+ (abs (- x 2)) (abs (- y 3)))))
+                    )
+                    (t 0)
+              )
+            )
         )
   )
 )

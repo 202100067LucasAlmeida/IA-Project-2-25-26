@@ -14,30 +14,28 @@
 
 (defvar *jogador2* -1)
 (defvar *jogador1* 1)
-(defconstant +infinity+ :infinity)
-(defconstant -infinity+ :-infinity)
+(defparameter *infinity* 9999999999999999)
 
-(defun negamax (no alfa beta altura jogador tempo &optional(nos-abertos nil) (nos-fechados nil) &aux(operadores (operadores)))
+(defun negamax (no alfa beta altura jogador tempo &optional(cor 1) &aux(operadores (operadores)))
   "Implementação do algoritmo Negamax com poda Alfa-Beta"
-  (negamax-recursivo alfa beta altura jogador (cons nos-abertos no) nos-fechados operadores)
-)
-
-(defun negamax-recursivo (alfa beta altura jogador nos-abertos nos-fechados)
-  (cond ((null nos-abertos) nil)
-        (t (let* ((no (car nos-abertos))
-                 (lista-sucessores (sucessores no operadores jogador :profundidade altura)))
-              (cond ((lista-sucessores) (negamax-recursivo alfa beta altura jogador 
-                                        (append lista-sucessores (cdr nos-abertos)) (cons (car lista-aberto) lista-fechado)))
-                    (t ())
-              )
-            )
-        
+  (let ((sucessores-no (sucessores no operadores jogador altura)))
+        (cond ((null sucessores-no) (* cor (no-heuristica no)))
+              (t (negamax-recursivo sucessores-no alfa beta altura jogador (- *infinity*) tempo cor))
         )
   )
 )
 
+(defun negamax-recursivo (sucessores-no alfa beta altura jogador melhor-valor tempo cor &aux(no (car sucessores-no)))
+  (cond ((or (>= alfa beta) (null sucessores-no)) melhor-valor)
+        (t (let* ((novo-melhor-valor (max melhor-valor (- (negamax no (- beta) (- alfa) altura (- jogador) tempo (- cor)))))
+                  (novo-alfa (max alfa melhor-valor)))
+              (negamax-recursivo (cdr sucessores-no) novo-alfa beta altura jogador novo-melhor-valor tempo cor)
+            )
+        )
+  )
+)
 
-(defun sucessores (no operadores jogador &key(profundidade)(heuristica 'heuristica))
+(defun sucessores (no operadores jogador profundidade &key(heuristica 'heuristica))
   "Gera a lista de sucessores do nó"
   (cond ((null no) nil)
         ((null operadores) nil)
@@ -83,5 +81,4 @@
 
 (defun heuristica (tabuleiro jogador)
   "Calcula a heurística de acordo com a quantidade de movimentos possiveis no tabuleiro"
-  (+ ())
 )
