@@ -16,7 +16,7 @@
 (defvar *jogador1* 1)
 (defparameter *infinity* 9999999999999999)
 
-(defun negamax (no alfa beta altura jogador tempo &optional(cor 1) &aux(operadores (operadores)))
+(defun negamax (no altura jogador tempo &optional(cor 1) (alfa (- *infinity*)) (beta *infinity*) &aux(operadores (operadores)))
   "Implementação do algoritmo Negamax com poda Alfa-Beta"
   (let ((sucessores-no (sucessores no operadores jogador altura)))
         (cond ((null sucessores-no) (* cor (no-heuristica no)))
@@ -27,8 +27,10 @@
 
 (defun negamax-recursivo (sucessores-no alfa beta altura jogador melhor-valor tempo cor &aux(no (car sucessores-no)))
   (cond ((or (>= alfa beta) (null sucessores-no)) melhor-valor)
-        (t (let* ((novo-melhor-valor (max melhor-valor (- (negamax no (- beta) (- alfa) altura (- jogador) tempo (- cor)))))
-                  (novo-alfa (max alfa melhor-valor)))
+        (t (let* ((novo-melhor-valor (max melhor-valor (- (negamax no altura (- jogador) tempo (- cor) (- beta) (- alfa)))))
+                  (novo-alfa (max alfa novo-melhor-valor))
+                  ;(aux (format t"~a~%" sucessores-no))
+                  )
               (negamax-recursivo (cdr sucessores-no) novo-alfa beta altura jogador novo-melhor-valor tempo cor)
             )
         )
@@ -80,5 +82,11 @@
 )
 
 (defun heuristica (tabuleiro jogador)
-  "Calcula a heurística de acordo com a quantidade de movimentos possiveis no tabuleiro"
+  "Calcula a heurística de acordo com a distancia de um peão até a vitória e a quantidade de peões, de ambos os jogadores"
+  (float (/ (+ (* (- (distancia-vitoria tabuleiro (- jogador)) (distancia-vitoria tabuleiro jogador)) 3) 
+    (* (- (quantidade-peao tabuleiro (- jogador)) (quantidade-peao tabuleiro jogador)) 4)) 10))
+)
+
+(defun jogada-humano (tabuleiro jogada jogador x y)
+  (funcall jogada jogador x y tabuleiro)
 )

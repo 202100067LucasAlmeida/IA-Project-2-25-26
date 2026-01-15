@@ -33,7 +33,7 @@
 
 (defun no-teste ()
   "Cria um nó para testes"
-  (list (tabuleiro-teste) 0 0 0 nil)
+  (list (tabuleiro-teste) 0 (heuristica (tabuleiro-teste) *jogador2*) 0 nil)
 )
 
 
@@ -68,7 +68,7 @@
 
 ;; Construtor
 (defun cria-no (tabuleiro heuristica jogador &optional (p 0) (pai nil))
-  "Criar um nó com o estado do tabuleiro sua profundidade e seu nó pai"
+  "Criar um nó com o estado do tabuleiro, sua profundidade, sua heuristica e seu nó pai"
   (list tabuleiro p (funcall heuristica tabuleiro jogador) pai)
 )
 
@@ -118,7 +118,7 @@
 
 ;; Funções Auxiliares
 
-;; Celula-validap
+;; Celula validap
 (defun celula-validap (x y tabuleiro)
   "Determina se a célula (x, y) do tabuleiro é válida (!= nil)"
   (cond ((null (celula x y tabuleiro)) nil)
@@ -126,7 +126,7 @@
   )
 )
 
-;; Substituir-posicao
+;; Substituir posicao
 (defun substituir-posicao (n linha x)
   "Substitui o indice n da linha por x"
   (cond ((or (not (posicao-validap n)) (null (nth (1- n) linha))) nil)
@@ -153,6 +153,7 @@
   )
 )
 
+;; Contém
 (defun contains (linha jogador)
   "Verifica se existe um dado jogador em uma linha"
   (some (lambda (x) 
@@ -161,30 +162,38 @@
           (t nil))) linha)
 )
 
-(defun distancia-vitoria (tabuleiro jogador &optional (x 1) (y 1))
-  "Calcula o peão que está mais perto de vencer de um dado jogador"
-  (cond ((> x 7) 0)
-        ((> y 7) (distancia-vitoria tabuleiro jogador (1+ x)))
+;; Distancia vitória
+(defun distancia-vitoria (tabuleiro jogador &optional (x 1) (y 1) (mais-proximo 1000))
+  "Calcula a distancia do peao mais proximo de vencer de um dado jogador"
+  (cond ((> x 7) mais-proximo)
+        ((> y 7) (distancia-vitoria tabuleiro jogador (1+ x) 1 mais-proximo))
         (t (let* ((cel (celula x y tabuleiro)))
-              (cond ((or (null cel) (/= cel jogador))
-                    (distancia-vitoria tabuleiro jogador x (1+ y)))
-                    ((= jogador *jogador1*)
-                    (cond 
-                      ((> y 4) (+ (abs (- x 6)) (abs (- y 5))))
-                      ((= y 4) (+ (abs (- x 6)) (abs (- y 4))))
-                      ((< y 4) (+ (abs (- x 6)) (abs (- y 3)))))
+              (cond ((or (null cel) (/= cel jogador)) (distancia-vitoria tabuleiro jogador x (1+ y) mais-proximo))
+                    (t (let ((dist-atual (cond 
+                                          ((= jogador *jogador1*)
+                                           (cond 
+                                             ((> y 4) (+ (abs (- x 6)) (abs (- y 5))))
+                                             ((= y 4) (+ (abs (- x 6)) (abs (- y 4))))
+                                             ((< y 4) (+ (abs (- x 6)) (abs (- y 3))))))
+                                          ((= jogador *jogador2*)
+                                           (cond 
+                                             ((> y 4) (+ (abs (- x 2)) (abs (- y 5))))
+                                             ((= y 4) (+ (abs (- x 2)) (abs (- y 4))))
+                                             ((< y 4) (+ (abs (- x 2)) (abs (- y 3))))))
+                                          (t 1000))))
+                          (distancia-vitoria tabuleiro jogador x (1+ y) (min mais-proximo dist-atual))
+                        )
                     )
-                    ((= jogador *jogador2*)
-                    (cond 
-                      ((> y 4) (+ (abs (- x 2)) (abs (- y 5))))
-                      ((= y 4) (+ (abs (- x 2)) (abs (- y 4))))
-                      ((< y 4) (+ (abs (- x 2)) (abs (- y 3)))))
-                    )
-                    (t 0)
               )
             )
         )
   )
+)
+
+;; Quantidade peão
+(defun quantidade-peao (tabuleiro jogador)
+  "Calcula a quantidade de peões de um dado jogador"
+  (reduce #'+ (mapcar (lambda (x) (count jogador x)) tabuleiro))
 )
 
 
@@ -204,7 +213,7 @@
                   (not (celula-validap x (+ y 2) tabuleiro))) nil)
              ((not (equal (celula x (+ y 2) tabuleiro) 0)) nil)
              ((or (not (equal (celula x y tabuleiro) jogador))
-                  (equal (celula x (1+ y) tabuleiro) jogador)) nil)
+                  (not (equal (celula x (1+ y) tabuleiro) (- jogador)))) nil)
              (t (substituir x y (substituir x (1+ y) (substituir x (+ y 2) tabuleiro jogador) 0) 0))
    )
 )
@@ -217,7 +226,7 @@
                   (not (celula-validap x (- y 2) tabuleiro))) nil)
              ((not (equal (celula x (- y 2) tabuleiro) 0)) nil)
              ((or (not (equal (celula x y tabuleiro) jogador))
-                  (equal (celula x (1- y) tabuleiro) jogador)) nil)
+                  (not (equal (celula x (1- y) tabuleiro) (- jogador)))) nil)
              (t (substituir x y (substituir x (1- y) (substituir x (- y 2) tabuleiro jogador) 0) 0))
    )
 )
@@ -230,7 +239,7 @@
                   (not (celula-validap (- x 2) y tabuleiro))) nil)
              ((not (equal (celula (- x 2) y tabuleiro) 0)) nil)
              ((or (not (equal (celula x y tabuleiro) jogador))
-                  (equal (celula (1- x) y tabuleiro) jogador)) nil)
+                  (not (equal (celula (1- x) y tabuleiro) (- jogador)))) nil)
              (t (substituir x y (substituir (1- x) y (substituir (- x 2) y tabuleiro jogador) 0) 0))
    )
 )
@@ -243,7 +252,7 @@
                   (not (celula-validap (+ x 2) y tabuleiro))) nil)
              ((not (equal (celula (+ x 2) y tabuleiro) 0)) nil)
              ((or (not (equal (celula x y tabuleiro) jogador))
-                  (equal (celula (1+ x) y tabuleiro) jogador)) nil)
+                  (not (equal (celula (1+ x) y tabuleiro) (- jogador)))) nil)
              (t (substituir x y (substituir (1+ x) y (substituir (+ x 2) y tabuleiro jogador) 0) 0))
    )
 )
