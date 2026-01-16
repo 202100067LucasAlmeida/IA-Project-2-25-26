@@ -89,7 +89,7 @@
 (defun heuristica (tabuleiro jogador)
   "Calcula a heurística de acordo com a distancia de um peão até a vitória e a quantidade de peões, de ambos os jogadores"
   (float (/ (+ (* (- (distancia-vitoria tabuleiro (- jogador)) (distancia-vitoria tabuleiro jogador)) 3) 
-    (* (- (quantidade-peao tabuleiro (- jogador)) (quantidade-peao tabuleiro jogador)) 4)) 10))
+    (* (- (quantidade-peao tabuleiro jogador) (quantidade-peao tabuleiro (- jogador))) 4)) 10))
 )
 
 (defun jogada-humano (tabuleiro jogada jogador x y)

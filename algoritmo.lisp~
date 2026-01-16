@@ -17,21 +17,26 @@
 (defparameter *infinity* 9999999999999999)
 
 (defun negamax (no altura jogador tempo &optional(cor 1) (alfa (- *infinity*)) (beta *infinity*) &aux(operadores (operadores)))
-  "Implementação do algoritmo Negamax com poda Alfa-Beta"
+  "Implementação do algoritmo Negamax com poda Alfa-Beta. Retorna uma lista (melhor-valor melhor-no)"
   (let ((sucessores-no (sucessores no operadores jogador altura)))
-        (cond ((null sucessores-no) (* cor (no-heuristica no)))
-              (t (negamax-recursivo sucessores-no alfa beta altura jogador (- *infinity*) tempo cor))
+        (cond ((null sucessores-no) (list (* cor (no-heuristica no)) nil))
+              (t (negamax-recursivo sucessores-no alfa beta altura jogador (- *infinity*) nil tempo cor))
         )
   )
 )
 
-(defun negamax-recursivo (sucessores-no alfa beta altura jogador melhor-valor tempo cor &aux(no (car sucessores-no)))
-  (cond ((or (>= alfa beta) (null sucessores-no)) melhor-valor)
-        (t (let* ((novo-melhor-valor (max melhor-valor (- (negamax no altura (- jogador) tempo (- cor) (- beta) (- alfa)))))
+(defun negamax-recursivo (sucessores-no alfa beta altura jogador melhor-valor melhor-filho tempo cor &aux(no (car sucessores-no)))
+  "Retorna uma lista (melhor-valor melhor-no) com o valor e o nó da melhor jogada"
+  (cond ((or (>= alfa beta) (null sucessores-no)) (list melhor-valor melhor-filho))
+        (t (let* ((resultado-filho (negamax no altura (- jogador) tempo (- cor) (- beta) (- alfa)))
+                  (valor-filho (- (first resultado-filho)))
+                  (novo-melhor-valor (max melhor-valor valor-filho))
                   (novo-alfa (max alfa novo-melhor-valor))
-                  ;(aux (format t"~a~%" sucessores-no))
-                  )
-              (negamax-recursivo (cdr sucessores-no) novo-alfa beta altura jogador novo-melhor-valor tempo cor)
+                  (novo-melhor-filho (cond ((> valor-filho melhor-valor) no)
+                                           (t melhor-filho)))
+                  ;(aux (format t"~a~%" no))
+                 )
+              (negamax-recursivo (cdr sucessores-no) novo-alfa beta altura jogador novo-melhor-valor novo-melhor-filho tempo cor)
             )
         )
   )
@@ -89,4 +94,8 @@
 
 (defun jogada-humano (tabuleiro jogada jogador x y)
   (funcall jogada jogador x y tabuleiro)
+)
+
+(defun jogada-computador (tabuleiro jogador altura tempo)
+  (no-estado (second (negamax (cria-no tabuleiro 'heuristica jogador) altura jogador tempo)))
 )

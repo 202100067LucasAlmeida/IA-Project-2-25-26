@@ -107,10 +107,10 @@
 
 (defun no-solucaop (no)
   "Verifica se o nó é um nó solução"
-  (cond ((or (contains (first (no-estado no)) *jogador2*))
+  (cond ((or (contains (first (no-estado no)) *jogador2*)
         (contains (second (no-estado no)) *jogador2*)
         (contains (sixth (no-estado no)) *jogador1*)
-        (contains (seventh (no-estado no)) *jogador1*) t)
+        (contains (seventh (no-estado no)) *jogador1*)) t)
         (t nil)
   )
 )
