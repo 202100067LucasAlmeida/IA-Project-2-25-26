@@ -1,0 +1,188 @@
+#|
+# Projeto 2 - Inteligência Artificial
+#
+# Ficheiro: jogo.lisp
+# Responsável pela interação com o utilizador, leitura/escrita de ficheiros.
+#
+# Docente > Joaquim Filipe
+#
+# Alunos:
+# > Danilo Victor, 202300224
+# > Jean Oliveira, 202300095
+# > Lucas Almeida, 202100067
+|#
+
+;;; Carregamento dos outros ficheiros do projeto
+
+(defun mostrar-tabuleiro (tabuleiro)
+  "Mostra o tabuleiro."
+   (mapcar (lambda (linha)(format t "~%~S~%" linha)) tabuleiro)
+)
+
+;;; Leitura de opções do utilizador
+
+(defun ler-modo ()
+  "Lê o modo de jogo: 1 - Humano vs Computador, 2 - Computador vs Computador."
+  (format t "~%Escolha o modo de jogo:~%")
+  (format t "1 - Humano vs Computador~%")
+  (format t "2 - Computador vs Computador~%")
+  (format t "> ")
+  (let ((opcao (read)))
+    (cond ((or (= opcao 1) (= opcao 2)) opcao)
+          (t (format t "~%Opção inválida. Tente novamente.~%")
+             (ler-modo))))
+)
+
+(defun ler-primeiro-jogador ()
+  "No modo Humano vs Computador, lê quem começa como Jogador 1."
+  (format t "~%Quem começa como Jogador 1 (peças no topo)?~%")
+  (format t "1 - Humano~%")
+  (format t "2 - Computador~%")
+  (format t "> ")
+  (let ((opcao (read)))
+    (cond ((= opcao 1) 'humano)
+          ((= opcao 2) 'computador)
+          (t (format t "~%Opção inválida. Tente novamente.~%")
+             (ler-primeiro-jogador))))
+)
+
+(defun ler-tempo ()
+  "Lê o tempo limite (em ms) para o computador jogar, entre 1000 e 20000."
+  (format t "~%Indique o tempo limite para o computador (em ms, entre 1000 e 20000):~%")
+  (format t "> ")
+  (let ((limite (read)))
+    (cond ((and (numberp limite) (>= limite 1000) (<= limite 20000)) limite)
+          (t (format t "~%Valor inválido. Tente novamente.~%")
+             (ler-tempo))))
+)
+
+;;; Operadores
+
+(defun operador-por-codigo (codigo)
+  "Mapeia o símbolo lido (d, e, c, b, cd, ce, cc, cb) para o operador correspondente."
+  (cond ((equal codigo 'd)  'operador-d)
+        ((equal codigo 'e)  'operador-e)
+        ((equal codigo 'c)  'operador-c)
+        ((equal codigo 'b)  'operador-b)
+        ((equal codigo 'cd) 'operador-cd)
+        ((equal codigo 'ce) 'operador-ce)
+        ((equal codigo 'cc) 'operador-cc)
+        ((equal codigo 'cb) 'operador-cb)
+        (t nil))
+)
+
+(defun ler-operador ()
+  "Lê o código do operador e devolve o símbolo do operador correspondente."
+  (format t "~%Operadores disponíveis: d, e, c, b, cd, ce, cc, cb~%")
+  (format t "Introduza o operador (por exemplo, d): ")
+  (let ((op (read)))
+    (let ((operador (operador-por-codigo op)))
+      (cond (operador operador)
+            (t (format t "~%Operador inválido. Tente novamente.~%")
+               (ler-operador))
+       )))
+)
+
+(defun ler-coordenada (texto)
+  "Lê uma coordenada (linha ou coluna) entre 1 e 7."
+  (format t "~A (1-7): " texto)
+  (let ((v (read)))
+    (cond ((and (integerp v) (>= v 1) (<= v 7)) v)
+          (t (format t "~%Coordenada inválida. Tente novamente.~%")
+             (ler-coordenada texto))
+     ))
+)
+
+;;; Turnos: Humano e Computador
+
+(defun turno-humano (estado jogador)
+  "Executa um turno de um jogador humano, devolvendo o novo estado."
+  (format t "~%--- Turno do Jogador ~A (Humano) ---~%"
+          (cond ((= jogador *jogador1*) 1)
+                (t 2)))
+  (mostrar-tabuleiro estado)
+  (let* ((operador (ler-operador))
+         (x (ler-coordenada "Linha"))
+         (y (ler-coordenada "Coluna"))
+         (novo-tabuleiro (jogada-humano estado operador jogador x y)))
+    (cond ((null novo-tabuleiro)
+            (format t "~%Jogada inválida. Tente novamente.~%")
+            (turno-humano estado jogador))
+          (t novo-tabuleiro)
+    )
+  )
+)
+
+(defun turno-computador (estado jogador tempo)
+  "Executa um turno do computador."
+  (format t "~%--- Turno do Jogador ~A (Computador) ---~%"
+          (cond ((= jogador *jogador1*) 1)
+                     (t 2)))
+	(let ((novo-tabuleiro (jogada-computador estado jogador 5 tempo)))
+		(mostrar-tabuleiro novo-tabuleiro)
+		novo-tabuleiro
+	)
+)
+
+
+;;; Lógica de jogo
+
+
+(defun proximo-jogador (jogador)
+  "Alterna entre Jogador 1 e Jogador 2."
+  (cond ((= jogador *jogador1*) *jogador2*)
+        (t *jogador1*))
+)
+
+(defun estado-final-p (estado)
+  "Verifica se o estado é final, recorrendo a no-solucaop."
+  (let ((no (cria-no estado 'heuristica *jogador1*)))
+    (no-solucaop no))
+)
+
+(defun tipo-de-jogador (modo primeiro jogador)
+  "Devolve 'humano ou 'computador para o jogador atual, consoante o modo e quem começou."
+  (cond
+    ;; Modo 2: Computador vs Computador
+    ((= modo 2) 'computador)
+    ;; Modo 1: Humano vs Computador
+    ((= modo 1)
+     (cond ((and (equal primeiro 'humano) (= jogador *jogador1*)) 'humano)
+           ((and (equal primeiro 'computador) (= jogador *jogador1*)) 'computador)
+           ((equal primeiro 'humano) 'computador)
+           (t 'humano)))
+    (t 'computador))
+)
+
+(defun ciclo-jogo (estado jogador modo primeiro tempo)
+  "Ciclo recursivo do jogo até atingir um estado final."
+  (cond
+    ((estado-final-p estado)
+     (format t "~%Jogo terminado.~%")
+     (mostrar-tabuleiro estado)
+     )
+    (t (let ((tipo (tipo-de-jogador modo primeiro jogador)))
+         (let ((novo-estado
+                (cond ((equal tipo 'humano)
+                       (turno-humano estado jogador))
+                      (t
+                       (turno-computador estado jogador tempo))
+                  )))
+           (ciclo-jogo novo-estado
+                       (proximo-jogador jogador)
+                       modo
+                       primeiro
+                       tempo))))
+   )
+)
+
+(defun iniciar ()
+  "Função principal para iniciar o jogo interativo."
+  (format t "~%=== Solitário 2 - Projeto 2 IA ===~%")
+  (let* ((modo (ler-modo))
+         (tempo (ler-tempo))
+         (primeiro (cond ((= modo 1) (ler-primeiro-jogador))
+                         (t 'computador)))
+         (estado-inicial (tabuleiro-teste)))
+    (ciclo-jogo estado-inicial *jogador1* modo primeiro tempo))
+)
